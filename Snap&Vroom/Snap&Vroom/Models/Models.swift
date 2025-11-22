@@ -238,3 +238,33 @@ struct Terminal: Codable {
     init(from decoder: Decoder) throws { }
     func encode(to encoder: Encoder) throws { }
 }
+
+
+struct CarPreferencePrediction: Codable {
+    let tripType: String
+    let carCategory: String
+    let addons: [String]
+    let protectionPackage: String
+    let musicVibe: String?
+    let peopleSummary: String?
+
+    func toString() -> String {
+        "Trip Type: \(tripType)\nCar Category: \(carCategory)\nAddons: \(addons.joined(separator: ", "))\nProtection Package: \(protectionPackage)\nMusic Vibe: \(musicVibe ?? "unknown")\nPeople Summary: \(peopleSummary ?? "none")"
+    }
+}
+
+struct OpenAIResponse: Decodable {
+    struct Output: Decodable {
+        struct Content: Decodable {
+            let type: String
+            let json: CarPreferencePrediction?
+        }
+        let content: [Content]
+    }
+
+    let output: [Output]
+}
+
+enum OpenAIParsingError: Error {
+    case missingPrediction
+}

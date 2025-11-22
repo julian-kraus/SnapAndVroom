@@ -14,6 +14,8 @@ class Navigation: ObservableObject {
     @Published var navPath = NavigationPath()
     
     @Published var capturedImage: UIImage? = nil
+    
+    @Published var carPreferencePrediction: CarPreferencePrediction? = nil
 
     
     enum View: Hashable {

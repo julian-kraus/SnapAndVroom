@@ -166,14 +166,20 @@ struct CameraView: View {
     }
 
     private func startCategorizationIfNeeded() {
-        guard capturedImage != nil else { return }
+        guard let image = capturedImage else { return }
         categorizeState = .processing
-
-        Task {
-            // Mock async work: categorize user and prepare print
-            try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
-            categorizeState = .idle
-            navigation.goTo(view: .picture_summary)
+        classifyImageForCarPrefs(image) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let prediction):
+                    navigation.carPreferencePrediction = prediction
+                    print(prediction.toString())
+                case .failure(let error):
+                    print("Classification failed:", error)
+                }
+                categorizeState = .idle
+                navigation.goTo(view: .picture_summary)
+            }
         }
     }
 
