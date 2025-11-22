@@ -63,7 +63,7 @@ func getInitialCar() -> SelectedVehicle? {
     enum View: Hashable {
         case pickup
         case camera
-        case packages(package: Package, booking: Booking)
+        case packages(packages: [Package], booking: Booking)
         case addons
         case car
         case insurance

@@ -36,8 +36,8 @@ struct Snap_VroomApp: App {
                             PickupView()
                         case .camera:
                             CameraView()
-                        case .packages(let package, let booking):
-                            PackagesView(package: package, booking: booking)
+                        case .packages(let packages, let booking):
+                            PackagesView(packages: packages, booking: booking)
                                 .navigationTitle("Based on your needs...")
                         case .addons:
                             AddonsView()

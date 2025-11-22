@@ -13,4 +13,5 @@ struct Package: Hashable {
     let description: String
     let originalPrice: Double
     let discountedPrice: Double
+    let isPrimary: Bool
 }
