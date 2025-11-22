@@ -11,7 +11,8 @@ struct PickupView: View {
     @EnvironmentObject private var navigation: Navigation
     
     var body: some View {
-        ZStack {
+        BookingDemoView()
+        /*ZStack {
             Color(.sixtOrange)
                 .ignoresSafeArea()
 
@@ -20,6 +21,8 @@ struct PickupView: View {
                 nextButton
                 backButton
             }
+        }*/.task {
+            await navigation.initializeBooking()
         }
     }
     

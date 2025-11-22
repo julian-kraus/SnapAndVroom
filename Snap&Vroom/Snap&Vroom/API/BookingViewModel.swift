@@ -19,7 +19,7 @@ final class BookingViewModel: ObservableObject {
     @Published var booking: Booking?
     @Published var vehiclesResponse: VehicleDealsResponse?
     @Published var protectionsResponse: ProtectionPackagesResponse?
-    @Published var addonsResponse: AddonsResponse?
+    @Published var addonsResponse: [AddonOption] = []
     
     // ID selection for actions
     @Published var selectedVehicleIdForAssign: String? = nil
@@ -104,15 +104,8 @@ final class BookingViewModel: ObservableObject {
         defer { isLoading = false }
         
         do {
-            // Adjust this request body to match your backend requirements
-            let req = CreateBookingRequest(
-                pickupStation: nil,
-                dropoffStation: nil,
-                pickupDateTime: nil,
-                dropoffDateTime: nil,
-                bookedCategory: "CDAR"
-            )
-            let newBooking = try await api.createBooking(req)
+            
+            let newBooking = try await api.createBooking()
             applyServerBooking(newBooking)
             self.selectedVehicleIdForAssign = nil
         } catch {

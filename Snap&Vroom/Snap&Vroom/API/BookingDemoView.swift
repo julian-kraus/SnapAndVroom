@@ -306,28 +306,19 @@ struct BookingDemoView: View {
                         }
                     }
                     
-                    // MARK: Addons List (read-only)
+                    // MARK: Addons List
                     
-                    if let addons = viewModel.addonsResponse {
+                    if !viewModel.addonsResponse.isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Addons (read-only demo)")
+                            Text("Addons")
                                 .font(.headline)
                             
-                            ForEach(addons.addons ?? [], id: \.id) { category in
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text((category.name ?? "").isEmpty ? "Category \(category.id)" : (category.name ?? ""))
-                                        .font(.subheadline.bold())
-                                    
-                                    ForEach((category.options ?? []).indices, id: \.self) { idx in
-                                        let option = (category.options ?? [])[idx]
-                                        if let price = option.additionalInfo?.price?.displayPrice {
-                                            if let addonId = option.chargeDetail?.id,
-                                               let title = option.chargeDetail?.title {
-                                                Button("Select") {
-                                                    Task { await viewModel.assignAddon(addonId: addonId, title: title) }
-                                                }
-                                                .buttonStyle(.bordered)
-                                            }
+                            ForEach(viewModel.addonsResponse.indices, id: \.self) { idx in
+                                let option = viewModel.addonsResponse[idx]
+                                
+                                if let price = option.additionalInfo?.price?.displayPrice {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        HStack {
                                             VStack(alignment: .leading, spacing: 2) {
                                                 Text(option.chargeDetail?.title ?? "-")
                                                     .font(.caption)
@@ -337,15 +328,22 @@ struct BookingDemoView: View {
                                                 Text("Price: \(price.amount) \(price.currency) \(price.suffix ?? "")")
                                                     .font(.caption2)
                                             }
-                                            .padding(6)
-                                            .background(Color(.tertiarySystemBackground))
-                                            .cornerRadius(8)
+                                            
+                                            Spacer()
+                                            
+                                            if let addonId = option.chargeDetail?.id,
+                                               let title = option.chargeDetail?.title {
+                                                Button("Select") {
+                                                    Task { await viewModel.assignAddon(addonId: addonId, title: title) }
+                                                }
+                                                .buttonStyle(.bordered)
+                                            }
                                         }
                                     }
+                                    .padding(8)
+                                    .background(Color(.secondarySystemBackground))
+                                    .cornerRadius(10)
                                 }
-                                .padding(8)
-                                .background(Color(.secondarySystemBackground))
-                                .cornerRadius(10)
                             }
                         }
                     }
