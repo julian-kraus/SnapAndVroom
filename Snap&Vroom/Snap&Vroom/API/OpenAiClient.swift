@@ -9,6 +9,7 @@ import UIKit
 
 func classifyImageForCarPrefs(
     _ image: UIImage,
+    bookingContext: String,
     completion: @escaping (Result<CarPreferencePrediction, Error>) -> Void
 ) {
     // 1) Encode image as base64 data URL
@@ -23,17 +24,32 @@ func classifyImageForCarPrefs(
     let schema: [String: Any] = [
         "type": "object",
         "properties": [
-            "trip_type": ["type": "string"],
-            "car_category": ["type": "string"],
-            "addons": [
+            "recommended_vehicle_id": ["type": "string"],
+            "recommended_vehicle_reason": ["type": "string"],
+            "recommended_protection_package_id": ["type": ["string", "null"]],
+            "recommended_protection_reason": ["type": ["string", "null"]],
+            "recommended_addons": [
                 "type": "array",
-                "items": ["type": "string"]
+                "items": [
+                    "type": "object",
+                    "properties": [
+                        "addon_id": ["type": "string"],
+                        "reason": ["type": "string"]
+                    ],
+                    "required": ["addon_id", "reason"],
+                    "additionalProperties": false
+                ]
             ],
-            "protection_package": ["type": "string"],
-            "music_vibe": ["type": ["string", "null"]],
-            "people_summary": ["type": ["string", "null"]]
+            "overall_explanation": ["type": ["string", "null"]]
         ],
-        "required": ["trip_type", "car_category", "addons", "protection_package", "music_vibe", "people_summary"],
+        "required": [
+            "recommended_vehicle_id",
+            "recommended_vehicle_reason",
+            "recommended_protection_package_id",
+            "recommended_protection_reason",
+            "recommended_addons",
+            "overall_explanation"
+        ],
         "additionalProperties": false
     ]
 
@@ -41,30 +57,39 @@ func classifyImageForCarPrefs(
     let prompt = """
     You work for a car rental company (similar to Sixt).
 
-    Look at the image and, based ONLY on non-sensitive visual context
-    (clothing style, luggage, equipment like skis/surfboard, apparent group size,
-    kids vs adults, and environment like airport/beach/city/mountains), estimate:
+    Your task:
+    - Based on the customer context and booking/inventory data, recommend:
+      1) ONE specific vehicle (using its id),
+      2) ONE protection package (using its id, or null if none is appropriate),
+      3) ONE or more addons (each with its addon id) where they add clear value (aim for 2–3 when appropriate, but avoid spamming unnecessary addons),
+    - For each of these (vehicle, protection package, each addon), explain briefly WHY you recommend it.
+    - The vehicle you recommend should generally be more expensive or more feature-rich than the initial selected car, if such an option exists, while still reasonably fitting the user context.
 
-    - trip_type: one of "business", "vacation", "family", "party", "one-way",
-      or a short custom text.
-    - car_category: e.g. "economy", "compact", "suv", "premium", "luxury", "van", "ev".
-    - addons: array of useful extras like "child_seat", "ski_rack", "gps",
-      "extra_driver", "wifi", "winter_tires", "premium_sound".
-    - protection_package: e.g. "basic", "standard", or "full".
-    - music_vibe: rough guess like "pop", "rock", "electronic", "classical",
-      "hiphop", "mixed", or "unknown".
-    - people_summary: short neutral description of the people
-      (e.g. "Two adults with carry-on suitcases", "Family with two small children and ski gear").
+    You will receive:
+    - A high-level description of the user and their trip (derived from the app / image).
+    - Booking context including the initial selected car.
+    - A list of available vehicles, protection packages, and addons with their IDs and key attributes.
 
-    Rules:
-    - Do NOT infer or mention race, ethnicity, nationality, religion, health,
-      disability, sexual orientation, or wealth/socioeconomic status.
-    - Do NOT guess exact ages, just general roles like "adults" or "children".
-    - If something is unclear, choose safe generic values like "unknown",
-      an empty list, or set the corresponding field to null or an empty string,
-      but never omit fields.
-    - Always include every field defined in the schema.
-    - Return ONLY valid JSON matching the provided schema. No extra text.
+    Use only the IDs provided in the context when recommending a vehicle, protection package, or addon. Do not invent new IDs.
+
+    Safety / fairness rules:
+    - Use only visible, non-sensitive cues (e.g. luggage, group size, clothing style, environment like airport/beach/mountain).
+    - Do NOT infer or mention race, ethnicity, nationality, religion, health, disability, sexual orientation, or wealth/socioeconomic status.
+    - Do NOT guess exact ages; use general roles like "adults" and "children".
+    - If something is unclear, make safe, neutral assumptions and avoid overfitting.
+
+    Output design:
+    - recommended_vehicle_id: the id of the vehicle you think is best for this user, preferring a more expensive/feature-rich car than the initial one when reasonable.
+    - recommended_vehicle_reason: short explanation in friendly language that can be shown to the user.
+    - recommended_protection_package_id: id of the chosen protection package, or null if the user clearly does not need one.
+    - recommended_protection_reason: short explanation for your protection choice, suitable for the user.
+    - recommended_addons: array of objects { addon_id, reason } where reason explains why that addon helps this user.
+    - overall_explanation: short summary tying everything together that can be shown to the user.
+
+    Booking and inventory context (vehicles, protection packages, addons, and initial selected car):
+    \(bookingContext)
+
+    Return ONLY valid JSON matching the provided schema. No extra commentary.
     """
 
     // 4) Build the request body

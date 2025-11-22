@@ -168,7 +168,7 @@ struct CameraView: View {
     private func startCategorizationIfNeeded() {
         guard let image = capturedImage else { return }
         categorizeState = .processing
-        classifyImageForCarPrefs(image) { result in
+        classifyImageForCarPrefs(image, bookingContext: navigation.makeBookingContext()) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let prediction):

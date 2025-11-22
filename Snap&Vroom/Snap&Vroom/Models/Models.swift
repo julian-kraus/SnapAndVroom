@@ -249,16 +249,41 @@ struct Terminal: Codable {
 }
 
 
+struct RecommendedAddon: Codable, Hashable {
+    let addonId: String
+    let reason: String
+}
+
 struct CarPreferencePrediction: Codable {
-    let tripType: String
-    let carCategory: String
-    let addons: [String]
-    let protectionPackage: String
-    let musicVibe: String?
-    let peopleSummary: String?
+    let recommendedVehicleId: String
+    let recommendedVehicleReason: String
+    let recommendedProtectionPackageId: String?
+    let recommendedProtectionReason: String?
+    let recommendedAddons: [RecommendedAddon]
+    let overallExplanation: String?
 
     func toString() -> String {
-        "Trip Type: \(tripType)\nCar Category: \(carCategory)\nAddons: \(addons.joined(separator: ", "))\nProtection Package: \(protectionPackage)\nMusic Vibe: \(musicVibe ?? "unknown")\nPeople Summary: \(peopleSummary ?? "none")"
+        var parts: [String] = []
+        parts.append("Recommended vehicle id: \(recommendedVehicleId)")
+        parts.append("Vehicle reason: \(recommendedVehicleReason)")
+        if let protectionId = recommendedProtectionPackageId {
+            parts.append("Protection package id: \(protectionId)")
+        } else {
+            parts.append("Protection package id: none")
+        }
+        if let protectionReason = recommendedProtectionReason {
+            parts.append("Protection reason: \(protectionReason)")
+        }
+        if recommendedAddons.isEmpty {
+            parts.append("Addons: none")
+        } else {
+            let addonLines = recommendedAddons.map { "- \($0.addonId): \($0.reason)" }
+            parts.append("Addons:\n" + addonLines.joined(separator: "\n"))
+        }
+        if let summary = overallExplanation {
+            parts.append("Overall explanation: \(summary)")
+        }
+        return parts.joined(separator: "\n")
     }
 }
 
