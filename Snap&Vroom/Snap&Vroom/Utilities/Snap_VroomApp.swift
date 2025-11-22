@@ -11,6 +11,7 @@ import SwiftData
 @main
 struct Snap_VroomApp: App {
     @ObservedObject private var navigation = Navigation()
+    @ObservedObject private var pickupViewModel = PickupViewModel()
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -53,6 +54,7 @@ struct Snap_VroomApp: App {
                     }
             }
             .environmentObject(navigation)
+            .environmentObject(pickupViewModel)
         }
         .modelContainer(sharedModelContainer)
     }

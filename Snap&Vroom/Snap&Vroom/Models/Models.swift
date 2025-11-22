@@ -9,13 +9,13 @@ import Foundation
 // MARK: - Common Types
 
 /// Simple money type used for things like vehicleCost, deductibleAmount, etc.
-struct Money: Codable {
+struct Money: Codable, Hashable {
     let currency: String
     let value: Double
 }
 
 /// A single price component (e.g. "+ 9.45 /day", "60.85 in total")
-struct PriceComponent: Codable {
+struct PriceComponent: Codable, Hashable {
     let currency: String
     let amount: Double
     let prefix: String?
@@ -24,7 +24,7 @@ struct PriceComponent: Codable {
 
 /// Generic pricing block with optional list/total price.
 /// Used for vehicle pricing, protection package pricing, addon pricing, etc.
-struct GenericPrice: Codable {
+struct GenericPrice: Codable, Hashable {
     let discountPercentage: Double
     let displayPrice: PriceComponent
     let listPrice: PriceComponent?
@@ -41,7 +41,7 @@ struct BookingAddon: Identifiable, Hashable {
 // MARK: - VEHICLE / BOOKING SIDE
 
 // Root of your original booking JSON
-struct Booking: Codable {
+struct Booking: Codable, Hashable {
     let bookedCategory: String?
     let protectionPackages: [ProtectionPackage]?
     let createdAt: String?
@@ -103,7 +103,7 @@ struct Booking: Codable {
 }
 
 // This is used both for the selectedVehicle and for items in "deals"
-struct SelectedVehicle: Codable {
+struct SelectedVehicle: Codable, Hashable {
     let vehicle: Vehicle
     let pricing: GenericPrice?
     let dealInfo: String?
@@ -111,7 +111,7 @@ struct SelectedVehicle: Codable {
     let priceTag: String?    // only present in some deals
 }
 
-struct Vehicle: Codable {
+struct Vehicle: Codable, Hashable {
     let id: String
     let brand: String?
     let model: String?
@@ -133,7 +133,7 @@ struct Vehicle: Codable {
     let upsellReasons: [String]?
 }
 
-struct VehicleAttribute: Codable {
+struct VehicleAttribute: Codable, Hashable {
     let key: String
     let title: String?
     let value: String?
@@ -148,7 +148,7 @@ struct ProtectionPackagesResponse: Codable {
     let protectionPackages: [ProtectionPackage]?
 }
 
-struct ProtectionPackage: Codable {
+struct ProtectionPackage: Codable, Hashable {
     let id: String
     let name: String?
     let description: String?              // only present on the "I don’t need protection" entry
@@ -163,7 +163,7 @@ struct ProtectionPackage: Codable {
     let isNudge: Bool?
 }
 
-struct ProtectionFeature: Codable {
+struct ProtectionFeature: Codable, Hashable {
     let id: String
     let title: String?
     let description: String?

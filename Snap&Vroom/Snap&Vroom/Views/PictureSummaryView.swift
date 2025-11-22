@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PictureSummaryView: View {
     @EnvironmentObject private var navigation: Navigation
+    @EnvironmentObject private var pickupViewModel: PickupViewModel
     
     private let carImageURL = URL(string: "https://vehicle-pictures-prod.orange.sixt.com/143456/ffffff/18_1.png")
     
@@ -36,7 +37,7 @@ struct PictureSummaryView: View {
                     }
                     
                     // User photo
-                    if let image = navigation.capturedImage {
+                    if let image = pickupViewModel.capturedImage {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Your souvenir photo")
                                 .font(.subheadline.weight(.semibold))
@@ -63,7 +64,7 @@ struct PictureSummaryView: View {
                         Text("Your Sixt car")
                             .font(.subheadline.weight(.semibold))
 
-                        VehicleCardView(selectedVehicle: navigation.getInitialCar())
+                        VehicleCardView(selectedVehicle: pickupViewModel.getInitialCar())
                     }
                     .padding(.horizontal)
                     
@@ -71,7 +72,12 @@ struct PictureSummaryView: View {
                     
                     // Primary action
                     Button {
-                        navigation.goTo(view: .packages)
+                        navigation.goTo(
+                            view: .packages(
+                                packages: [],
+                                booking: $pickupViewModel.currentBooking.wrappedValue! // FIX ME
+                            )
+                        )
                     } label: {
                         Text("Continue to your booking")
                             .frame(maxWidth: .infinity)

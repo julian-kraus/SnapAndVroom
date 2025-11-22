@@ -10,6 +10,8 @@ import UIKit
 
 struct CameraView: View {
     @EnvironmentObject private var navigation: Navigation
+    @EnvironmentObject private var pickupViewModel: PickupViewModel
+
     @State private var capturedImage: UIImage? = nil
     @State private var categorizeState: CategorizeState = .idle
     @State private var showCameraSheet: Bool = false
@@ -159,7 +161,7 @@ struct CameraView: View {
             ImagePicker(selectedImage: $capturedImage)
         }
         .onChange(of: capturedImage) { _ in
-            navigation.capturedImage = capturedImage
+            pickupViewModel.capturedImage = capturedImage
             startCategorizationIfNeeded()
         }
         .navigationBarBackButtonHidden(true)
@@ -168,11 +170,11 @@ struct CameraView: View {
     private func startCategorizationIfNeeded() {
         guard let image = capturedImage else { return }
         categorizeState = .processing
-        classifyImageForCarPrefs(image, bookingContext: navigation.makeBookingContext()) { result in
+        classifyImageForCarPrefs(image, bookingContext: pickupViewModel.makeBookingContext()) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let prediction):
-                    navigation.carPreferencePrediction = prediction
+                    pickupViewModel.carPreferencePrediction = prediction
                     print(prediction.toString())
                 case .failure(let error):
                     print("Classification failed:", error)

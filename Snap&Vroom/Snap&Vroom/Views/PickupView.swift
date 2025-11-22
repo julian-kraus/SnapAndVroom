@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PickupView: View {
     @EnvironmentObject private var navigation: Navigation
+    @EnvironmentObject private var pickupViewModel: PickupViewModel
     
     var body: some View {
         ZStack {
@@ -21,7 +22,7 @@ struct PickupView: View {
                 backButton
             }
         }.task {
-            await navigation.initializeBooking()
+            await pickupViewModel.initializeBooking()
         }
     }
     
