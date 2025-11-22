@@ -11,10 +11,15 @@ struct PickupView: View {
     @EnvironmentObject private var navigation: Navigation
     
     var body: some View {
-        VStack {
-            Text("Pickup View")
-            nextButton
-            backButton
+        ZStack {
+            Color(.sixtOrange)
+                .ignoresSafeArea()
+
+            VStack {
+                Text("Pickup View")
+                nextButton
+                backButton
+            }
         }
     }
     
