@@ -20,6 +20,8 @@ struct PickupView: View {
                 nextButton
                 backButton
             }
+        }.task {
+            await navigation.initializeBooking()
         }
     }
     

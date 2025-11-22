@@ -67,6 +67,8 @@ final class SixtAPIClient {
             print("[API] Response body:", String(data: data, encoding: .utf8) ?? "<no body>")
             throw APIError.httpError(statusCode: httpResponse.statusCode, data: data)
         }
+        // Debug: print response body for successful requests
+        print("[API] Response body:", String(data: data, encoding: .utf8) ?? "<no body>")
         
         do {
             let decoder = JSONDecoder()
@@ -96,14 +98,11 @@ struct CreateBookingRequest: Encodable {
 extension SixtAPIClient {
     
     /// POST /api/booking
-    func createBooking(_ requestBody: CreateBookingRequest) async throws -> Booking {
-        let encoder = JSONEncoder()
-        let bodyData = try encoder.encode(requestBody)
-        
+    func createBooking() async throws -> Booking {
         let request = try makeRequest(
             path: "/api/booking",
             method: "POST",
-            body: bodyData
+            body: nil
         )
         
         return try await sendRequest(request, decodeTo: Booking.self)
@@ -168,10 +167,21 @@ extension SixtAPIClient {
 extension SixtAPIClient {
     
     /// GET /api/booking/<BOOKING_ID>/addons
-    func getAddons(for bookingId: String) async throws -> AddonsResponse {
+    func getAddons(for bookingId: String) async throws -> [AddonOption] {
         let path = "/api/booking/\(bookingId)/addons"
         let request = try makeRequest(path: path, method: "GET")
-        return try await sendRequest(request, decodeTo: AddonsResponse.self)
+        let response = try await sendRequest(request, decodeTo: AddonsResponse.self)
+        let categories = response.addons ?? []
+        print("[Addons] Category count = \(categories.count)")
+
+        let options = categories.flatMap { category in
+            let count = category.options?.count ?? 0
+            print("[Addons] Category ID \(category.id) has \(count) options")
+            return category.options ?? []
+        }
+
+        print("[Addons] Total addon options = \(options.count)")
+        return options
     }
 }
 

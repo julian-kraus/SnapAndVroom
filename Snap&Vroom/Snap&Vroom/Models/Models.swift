@@ -60,6 +60,15 @@ struct Booking: Codable {
     }
 
     init(from decoder: Decoder) throws {
+        // DEBUG: print full booking JSON
+        if let debugJson = try? JSONSerialization.jsonObject(with: decoder.singleValueContainer().decode(Data.self)),
+           let pretty = try? JSONSerialization.data(withJSONObject: debugJson, options: .prettyPrinted),
+           let jsonString = String(data: pretty, encoding: .utf8) {
+            print("[Booking DEBUG] Raw JSON:\n\(jsonString)")
+        } else {
+            print("[Booking DEBUG] Unable to print raw JSON (decoder not single-value)")
+        }
+
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         bookedCategory = try? container.decode(String.self, forKey: .bookedCategory)

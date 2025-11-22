@@ -63,51 +63,7 @@ struct PictureSummaryView: View {
                         Text("Your Sixt car")
                             .font(.subheadline.weight(.semibold))
 
-                        ZStack {
-                            // White base so gradient has contrast
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(Color.white)
-
-                            // Sixt-style black → transparent gradient overlay
-                            LinearGradient(
-                                colors: [
-                                    Color.black.opacity(0.85),
-                                    Color.black.opacity(0.4),
-                                    Color.black.opacity(0.0)
-                                ],
-                                startPoint: .bottom,
-                                endPoint: .top
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-
-                            AsyncImage(url: carImageURL) { phase in
-                                switch phase {
-                                case .empty:
-                                    ZStack {
-                                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                            .fill(Color(.systemGray6).opacity(0.3))
-                                        ProgressView()
-                                    }
-                                case .success(let image):
-                                    image
-                                        .resizable()
-                                        .scaledToFit()
-                                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                                        .shadow(radius: 10, y: 6)
-                                case .failure:
-                                    ZStack {
-                                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                            .fill(Color(.systemGray6).opacity(0.3))
-                                        Image(systemName: "car.fill")
-                                            .font(.system(size: 32))
-                                            .foregroundColor(.white.opacity(0.7))
-                                    }
-                                @unknown default:
-                                    EmptyView()
-                                }
-                            }
-                        }
-                        .frame(height: 180)
+                        VehicleCardView(selectedVehicle: navigation.getInitialCar())
                     }
                     .padding(.horizontal)
                     
