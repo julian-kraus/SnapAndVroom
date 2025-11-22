@@ -7,10 +7,17 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 class Navigation: ObservableObject {
+    var objectWillChange: ObservableObjectPublisher
+    
     
     @Published var navPath = NavigationPath()
+    
+    init() {
+        objectWillChange = .init();
+    }
     
     enum View: Hashable {
         case pickup
