@@ -46,6 +46,8 @@ struct Snap_VroomApp: App {
                             InsuranceView()
                         case .confirmation:
                             ConfirmationView()
+                        case .picture_summary:
+                            PictureSummaryView()
                         }
                     }
             }

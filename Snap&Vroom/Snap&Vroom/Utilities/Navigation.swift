@@ -13,6 +13,9 @@ class Navigation: ObservableObject {
     
     @Published var navPath = NavigationPath()
     
+    @Published var capturedImage: UIImage? = nil
+
+    
     enum View: Hashable {
         case pickup
         case camera
@@ -21,6 +24,7 @@ class Navigation: ObservableObject {
         case car
         case insurance
         case confirmation
+        case picture_summary
     }
     
     func goTo(view: View) {
